@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "date table"
+    columns:
+      - name: date_key
+        description: "The primary key for this table"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_customer
+    description: "customer data"
+    columns:
+      - name: customer_id
+        description: "The primary key for this table"
+        data_type: integer
+        data_tests:
+          - not_null
+          - unique
+      - name: city_name
+        data_type: character varying
+        tests:
+          - accepted_values:
+              values:
+                - Tel Aviv

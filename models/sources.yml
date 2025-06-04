@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+    - name: stg
+      schema: stg
+      tables:
+        - name: z_refresh_from
+        - name: cust
+          identifier: customer
+        - name: address
+        - name: city
+        - name: film
