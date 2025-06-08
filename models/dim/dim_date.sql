@@ -1,10 +1,3 @@
-{{
-  config(
-    pre_hook="delete from {{this}}"
-    )
-}}
-
-
 with dates as (
 SELECT
        TO_CHAR(datum, 'yyyymmdd')::INT AS date_dim_id,
