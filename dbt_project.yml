@@ -7,7 +7,8 @@ version: '1.0.0'
 
 # This setting configures which "profile" dbt uses for this project.
 profile: 'sakila_dbt'
-
+vars:
+  init_date: '1900-01-01'
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
@@ -24,7 +25,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
+on-run-start:
+  - CREATE SCHEMA IF NOT EXISTS dwh;
+  - CREATE TABLE if not exists dwh.log_table (id varchar(50), start_at timestamptz, end_at timestamp);
+  - INSERT INTO dwh.log_table (id, start_at) VALUES ('{{ invocation_id}}', now());
 
+on-run-end: 
+  - UPDATE dwh.log_table SET end_at = now() WHERE id = '{{ invocation_id}}';
 # In this example config, we tell dbt to build all models in the example/
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
@@ -38,3 +45,4 @@ models:
     dim:
       +materialized: incremental
       +pre_hook: "{{ delete_from(this) }}"
+      +schema: dim
