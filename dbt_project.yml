@@ -20,7 +20,6 @@ snapshot-paths: ["snapshots"]
 
 clean-targets:         # directories to be removed by `dbt clean`
   - "target"
-  - "dbt_packages"
 
 
 # Configuring models
@@ -35,6 +34,7 @@ models:
     example:
       +materialized: view
       +schema: example
-      # +enabled: false
+      +enabled: false
     dim:
       +materialized: incremental
+      +pre_hook: "{{ delete_from(this) }}"
