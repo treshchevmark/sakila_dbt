@@ -9,6 +9,8 @@ case
     when length <= 120 then 'medium'
     else 'long'
 end as length_desc,
+'{{ run_started_at }}'::timestamp AT TIME ZONE 'UTC' as etl_time,
+'{{ run_started_at.strftime("%Y-%m-%d %H:%M:%S") }}' as etl_time_str,
 {% for feature in my_column_list %}
     case when film.special_features  ilike '%{{ feature }}%' then 1 else 0 end as "is_{{feature}}"
     {% if not loop.last %}, {% endif %}
