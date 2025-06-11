@@ -28,10 +28,10 @@ clean-targets:         # directories to be removed by `dbt clean`
 on-run-start:
   - CREATE SCHEMA IF NOT EXISTS dwh;
   - CREATE TABLE if not exists dwh.log_table (id varchar(50), start_at timestamptz, end_at timestamp);
-  - INSERT INTO dwh.log_table (id, start_at) VALUES ('{{ invocation_id}}', now());
+  - "{{ run_log('insert', 'general') }}"
 
 on-run-end: 
-  - UPDATE dwh.log_table SET end_at = now() WHERE id = '{{ invocation_id}}';
+  - "{{ run_log('update', 'general') }}"
 # In this example config, we tell dbt to build all models in the example/
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
@@ -44,5 +44,11 @@ models:
       +enabled: false
     dim:
       +materialized: incremental
-      +pre_hook: "{{ delete_from(this) }}"
+      +pre_hook: ["{{ delete_from(this) }}","{{ run_log('insert', this.name) }}"]
       +schema: dim
+      +post_hook: "{{ run_log('update', this.name) }}"
+    fact:
+      +materialized: incremental
+      +schema: fact
+      +pre_hook: "{{ run_log('update', this.name) }}"
+      +post_hook: "{{ run_log('update', this.name) }}"

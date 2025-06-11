@@ -9,4 +9,13 @@ sources:
           identifier: customer
         - name: address
         - name: city
+        - name: country
         - name: film
+        - name: rental
+        - name: film_category
+        - name: category
+        - name: language
+        - name: staff
+        - name: store
+        - name: inventory
+        - name: payment
