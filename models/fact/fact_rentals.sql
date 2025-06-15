@@ -33,6 +33,6 @@ left join {{ ref('dim_film') }} as film on film.film_id = inv.film_id
   where rental.rental_date > coalesce(
                                       (select from_date from refresh_date), 
                                       (select max(rental_date) from {{ this }}), 
-                                      {{ var('init_date') }}
+                                      '{{ var('init_date') }}'
 )
 {% endif %}

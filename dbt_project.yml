@@ -9,6 +9,7 @@ version: '1.0.0'
 profile: 'sakila_dbt'
 vars:
   init_date: '1900-01-01'
+  retro_rental_id: 500000
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
@@ -40,8 +41,12 @@ models:
     # Config indicated by + and applies to all files under models/example/
     example:
       +materialized: view
+      +transactions: false
       +schema: example
       +enabled: false
+      +pre_hook: ["{{ delete_from(this) }}","{{ run_log('insert', this.name) }}"]
+      +post_hook: "{{ run_log('update', this.name) }}"
+
     dim:
       +materialized: incremental
       +pre_hook: ["{{ delete_from(this) }}","{{ run_log('insert', this.name) }}"]
