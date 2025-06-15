@@ -13,6 +13,7 @@ with refresh_date as (
 )
 select 
 rental.rental_id,
+rental.rental_date,
 case when film.film_id is not null then film.film_id else -1 end as film_id,
 case when cust.customer_id is not null then cust.customer_id else -1 end as customer_id,
 case when staff.staff_id is not null then staff.staff_id else -1 end as staff_id,
