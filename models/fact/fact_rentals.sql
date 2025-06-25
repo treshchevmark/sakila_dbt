@@ -2,15 +2,10 @@
   config(
     materialized = 'incremental',
     unique_key = 'rental_id',
+    pre_hook = '{{ inc_rental() }}'
     )
 }}
 
-with refresh_date as (
-    select 
-    from_date
-    from {{ source('stg', 'z_refresh_from') }}
-    where table_name = '{{this}}' and to_refresh = 1
-)
 select 
 rental.rental_id,
 rental.rental_date,
@@ -23,16 +18,9 @@ case when return_date is null then 0 else 1 end as is_return,
 extract(epoch from (rental_date - return_date))/60 as return_date_hr,
 '{{ run_started_at }}'::timestamp AT TIME ZONE 'UTC' as etl_time,
 '{{ run_started_at.strftime("%Y-%m-%d %H:%M:%S") }}' as etl_time_str
-from {{ source('stg', 'rental') }} as rental
+from {{ source('target_fact', 'fact_rentals_tmp') }} as rental
 left join {{ source('stg', 'inventory') }} as inv on inv.inventory_id = rental.inventory_id
 left join {{ ref('dim_customer') }}  as cust on rental.customer_id = cust.customer_id
 left join {{ ref('dim_staff') }} as staff on staff.staff_id = rental.staff_id
 left join {{ ref('dim_store') }} as store on store.store_id = inv.store_id
 left join {{ ref('dim_film') }} as film on film.film_id = inv.film_id
-{% if is_incremental() %}
-  where rental.rental_date > coalesce(
-                                      (select from_date from refresh_date), 
-                                      (select max(rental_date) from {{ this }}), 
-                                      '{{ var('init_date') }}'
-)
-{% endif %}

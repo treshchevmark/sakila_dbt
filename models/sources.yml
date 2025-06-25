@@ -1,6 +1,12 @@
 version: 2
 
 sources:
+    - name: target_fact
+      schema: fact
+      tables:
+        - name: fact_rentals
+        - name: fact_rentals_tmp
+
     - name: stg
       schema: stg
       tables:

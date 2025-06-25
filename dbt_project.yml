@@ -49,9 +49,11 @@ models:
 
     dim:
       +materialized: incremental
-      +pre_hook: ["{{ delete_from(this) }}","{{ run_log('insert', this.name) }}"]
+      +pre_hook: "{{ run_log('insert', this.name) }}"
       +schema: dim
       +post_hook: "{{ run_log('update', this.name) }}"
+      dim_full_refresh:
+        +pre_hook: "{{ delete_from(this) }}"
     fact:
       +materialized: incremental
       +schema: fact
